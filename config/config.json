@@ -1,0 +1,6 @@
+{
+  "welcome": "Welcome",
+  "auth_msg": "Hi! You are not authorized. Please send your Surname Name and auth data",
+  "authorized": "Hey! I know you!",
+  "teams_button_title": "Teams"
+}
