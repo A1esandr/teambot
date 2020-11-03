@@ -38,6 +38,7 @@ type User struct {
 }
 
 type Message struct {
+	UserID   int
 	UserName string
 	Text     string
 }
@@ -138,7 +139,11 @@ func (a *App) Start() {
 			fmt.Print(update)
 		}
 
-		userMsg := &Message{UserName: update.Message.From.UserName, Text: update.Message.Text}
+		userMsg := &Message{
+			UserID:   update.Message.From.ID,
+			UserName: update.Message.From.UserName,
+			Text:     update.Message.Text,
+		}
 		text := a.handle(userMsg)
 		keyboard := a.chooseKeyboard(text)
 
