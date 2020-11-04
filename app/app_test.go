@@ -10,9 +10,11 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+const token = "TOKEN"
+
 func SetUp() *App {
 	app := NewApp()
-	err := os.Setenv("TOKEN", "test")
+	err := os.Setenv(token, "test")
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -21,7 +23,7 @@ func SetUp() *App {
 
 func SetUpReadyApp() *App {
 	app := NewApp()
-	err := os.Setenv("TOKEN", "test")
+	err := os.Setenv(token, "test")
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -30,7 +32,7 @@ func SetUpReadyApp() *App {
 }
 
 func CleanUp() {
-	err := os.Setenv("TOKEN", "")
+	err := os.Setenv(token, "")
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -39,13 +41,13 @@ func CleanUp() {
 func TestWhenApp_Init_LoadTokenFromEnv(t *testing.T) {
 	app := NewApp()
 
-	err := os.Setenv("TOKEN", "test")
+	err := os.Setenv(token, "test")
 	if err != nil {
 		fmt.Println(err)
 	}
 	app.init()
 	// Clean up
-	err = os.Setenv("TOKEN", "")
+	err = os.Setenv(token, "")
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -71,13 +73,13 @@ func TestWhenApp_Init_PanicsWithoutToken(t *testing.T) {
 func TestWhenApp_Init_LoadMessages(t *testing.T) {
 	app := NewApp()
 
-	err := os.Setenv("TOKEN", "test")
+	err := os.Setenv(token, "test")
 	if err != nil {
 		fmt.Println(err)
 	}
 	app.init()
 	// Clean up
-	err = os.Setenv("TOKEN", "")
+	err = os.Setenv(token, "")
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -146,7 +148,7 @@ func TestWhenUser_NotAuthorized_ShowWelcomeAuthMessage(t *testing.T) {
 	input := &Message{}
 	msg := app.handle(input)
 
-	assert.Equal(t, "Hi! You are not authorized. Please send your Surname Name and auth data", msg)
+	assert.Equal(t, app.config.AuthMsg, msg)
 }
 
 func TestWhenUser_NotAuthorized_SendsAuthMessage(t *testing.T) {
@@ -156,7 +158,7 @@ func TestWhenUser_NotAuthorized_SendsAuthMessage(t *testing.T) {
 	input := &Message{Text: "Smith John abc"}
 	msg := app.handle(input)
 
-	assert.Equal(t, "Hey! I know you!", msg)
+	assert.Equal(t, app.config.Authorized, msg)
 }
 
 func TestWhenUser_Authorized_SendHomeKeyboard(t *testing.T) {

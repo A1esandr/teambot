@@ -9,6 +9,7 @@ import (
 	"log"
 	"os"
 	"strings"
+	"sync"
 )
 
 var (
@@ -20,7 +21,7 @@ type App struct {
 	token        string
 	config       *Config
 	users        map[string][]User
-	authorized   map[string]struct{}
+	auth         *Auth
 	homeKeyboard tgbotapi.InlineKeyboardMarkup
 }
 
@@ -29,6 +30,11 @@ type Config struct {
 	AuthMsg    string `json:"auth_msg"`
 	Authorized string `json:"authorized"`
 	TeamsTitle string `json:"teams_button_title"`
+}
+
+type Auth struct {
+	authorized map[int]struct{}
+	mu         sync.RWMutex
 }
 
 type User struct {
@@ -44,7 +50,7 @@ type Message struct {
 }
 
 func NewApp() *App {
-	return &App{config: &Config{}, users: map[string][]User{}, authorized: map[string]struct{}{}}
+	return &App{config: &Config{}, users: map[string][]User{}, auth: &Auth{authorized: map[int]struct{}{}}}
 }
 
 func (a *App) init() {
@@ -181,7 +187,7 @@ func (a *App) chooseKeyboard(text string) tgbotapi.InlineKeyboardMarkup {
 
 func (a *App) handle(msg *Message) string {
 	var authorized bool
-	if !a.checkAuth(msg.UserName) {
+	if !a.checkAuth(msg.UserID) {
 		authorized = a.authorize(msg)
 		if !authorized {
 			return a.config.AuthMsg
@@ -191,8 +197,10 @@ func (a *App) handle(msg *Message) string {
 	return a.chooseMsg(msg.Text)
 }
 
-func (a *App) checkAuth(user string) bool {
-	_, ok := a.authorized[user]
+func (a *App) checkAuth(userID int) bool {
+	a.auth.mu.RLock()
+	_, ok := a.auth.authorized[userID]
+	a.auth.mu.RUnlock()
 	return ok
 }
 
@@ -208,7 +216,9 @@ func (a *App) authorize(msg *Message) bool {
 		if strings.ToLower(data[0]) == user.Surname &&
 			strings.ToLower(data[1]) == user.Name &&
 			strings.ToLower(data[2]) == user.Data {
-			a.authorized[msg.UserName] = struct{}{}
+			a.auth.mu.Lock()
+			a.auth.authorized[msg.UserID] = struct{}{}
+			a.auth.mu.Unlock()
 			return true
 		}
 	}
