@@ -2,5 +2,12 @@
   "welcome": "Welcome",
   "auth_msg": "Hi! You are not authorized. Please send your Surname Name and auth data",
   "authorized": "Hey! I know you!",
-  "teams_button_title": "Teams"
+  "teams_button_title": "Teams",
+  "teams": [
+    {"name": "first",
+      "members": [
+        {"name": "John", "surname": "Smith"}, {"name": "Jane", "surname": "Smith"}, {"name": "Joe", "surname": "Wilson"}
+      ]
+    }
+  ]
 }

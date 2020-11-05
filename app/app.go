@@ -17,37 +17,39 @@ var (
 	ReaderFile = ioutil.ReadFile
 )
 
-type App struct {
-	token        string
-	config       *Config
-	users        map[string][]User
-	auth         *Auth
-	homeKeyboard tgbotapi.InlineKeyboardMarkup
-}
+type (
+	App struct {
+		token        string
+		config       *Config
+		users        map[string][]User
+		auth         *Auth
+		homeKeyboard tgbotapi.InlineKeyboardMarkup
+	}
 
-type Config struct {
-	Welcome    string `json:"welcome"`
-	AuthMsg    string `json:"auth_msg"`
-	Authorized string `json:"authorized"`
-	TeamsTitle string `json:"teams_button_title"`
-}
+	Config struct {
+		Welcome    string `json:"welcome"`
+		AuthMsg    string `json:"auth_msg"`
+		Authorized string `json:"authorized"`
+		TeamsTitle string `json:"teams_button_title"`
+	}
 
-type Auth struct {
-	authorized map[int]struct{}
-	mu         sync.RWMutex
-}
+	Auth struct {
+		authorized map[int]struct{}
+		mu         sync.RWMutex
+	}
 
-type User struct {
-	Name    string
-	Surname string
-	Data    string
-}
+	User struct {
+		Name    string
+		Surname string
+		Data    string
+	}
 
-type Message struct {
-	UserID   int
-	UserName string
-	Text     string
-}
+	Message struct {
+		UserID   int
+		UserName string
+		Text     string
+	}
+)
 
 func NewApp() *App {
 	return &App{config: &Config{}, users: map[string][]User{}, auth: &Auth{authorized: map[int]struct{}{}}}
