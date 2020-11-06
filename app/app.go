@@ -22,6 +22,7 @@ type (
 		token        string
 		config       *Config
 		users        map[string][]User
+		teams        []Team
 		auth         *Auth
 		homeKeyboard tgbotapi.InlineKeyboardMarkup
 	}
@@ -36,6 +37,11 @@ type (
 	Auth struct {
 		authorized map[int]struct{}
 		mu         sync.RWMutex
+	}
+
+	Team struct {
+		Name  string
+		Users []User
 	}
 
 	User struct {
