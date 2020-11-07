@@ -19,10 +19,10 @@ var (
 
 type (
 	App struct {
-		token        string
-		config       *Config
-		users        map[string][]User
-		teams        []Team
+		token  string
+		config *Config
+		users  map[string][]User
+
 		auth         *Auth
 		homeKeyboard tgbotapi.InlineKeyboardMarkup
 	}
@@ -32,6 +32,7 @@ type (
 		AuthMsg    string `json:"auth_msg"`
 		Authorized string `json:"authorized"`
 		TeamsTitle string `json:"teams_button_title"`
+		Teams      []Team `json:"teams"`
 	}
 
 	Auth struct {
@@ -40,13 +41,13 @@ type (
 	}
 
 	Team struct {
-		Name  string
-		Users []User
+		Name  string `json:"name"`
+		Users []User `json:"members"`
 	}
 
 	User struct {
-		Name    string
-		Surname string
+		Name    string `json:"name"`
+		Surname string `json:"surname"`
 		Data    string
 	}
 
@@ -150,7 +151,16 @@ func (a *App) Start() {
 		log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
 
 		if update.CallbackQuery != nil {
-			fmt.Print(update)
+			fmt.Println(update)
+			_, err = bot.AnswerCallbackQuery(tgbotapi.NewCallback(update.CallbackQuery.ID, update.CallbackQuery.Data))
+			if err != nil {
+				log.Println(err)
+			}
+
+			_, err = bot.Send(tgbotapi.NewMessage(update.CallbackQuery.Message.Chat.ID, update.CallbackQuery.Data))
+			if err != nil {
+				log.Println(err)
+			}
 		}
 
 		userMsg := &Message{
