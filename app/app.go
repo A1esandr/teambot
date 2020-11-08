@@ -144,18 +144,27 @@ func (a *App) Start() {
 	updates, err := bot.GetUpdatesChan(u)
 
 	for update := range updates {
-		if update.Message == nil { // ignore any non-Message Updates
+		userMsg := &Message{
+			UserID:   update.Message.From.ID,
+			UserName: update.Message.From.UserName,
+			Text:     update.Message.Text,
+		}
+
+		guest, text := a.checkAuthorized(userMsg)
+		if guest {
+			msg := tgbotapi.NewMessage(update.Message.Chat.ID, text)
+			if text == a.config.Authorized {
+				msg.ReplyMarkup = a.homeKeyboard
+			}
+			_, err := bot.Send(msg)
+			if err != nil {
+				fmt.Println(err)
+			}
 			continue
 		}
 
-		log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
-
 		if update.CallbackQuery != nil {
 			fmt.Println(update)
-			_, err = bot.AnswerCallbackQuery(tgbotapi.NewCallback(update.CallbackQuery.ID, update.CallbackQuery.Data))
-			if err != nil {
-				log.Println(err)
-			}
 
 			_, err = bot.Send(tgbotapi.NewMessage(update.CallbackQuery.Message.Chat.ID, update.CallbackQuery.Data))
 			if err != nil {
@@ -163,12 +172,13 @@ func (a *App) Start() {
 			}
 		}
 
-		userMsg := &Message{
-			UserID:   update.Message.From.ID,
-			UserName: update.Message.From.UserName,
-			Text:     update.Message.Text,
+		if update.Message == nil { // ignore any non-Message Updates
+			continue
 		}
-		text := a.handle(userMsg)
+
+		log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
+
+		text = a.handle(userMsg)
 		keyboard := a.chooseKeyboard(text)
 
 		msg := tgbotapi.NewMessage(update.Message.Chat.ID, text)
@@ -204,15 +214,17 @@ func (a *App) chooseKeyboard(text string) tgbotapi.InlineKeyboardMarkup {
 }
 
 func (a *App) handle(msg *Message) string {
-	var authorized bool
-	if !a.checkAuth(msg.UserID) {
-		authorized = a.authorize(msg)
-		if !authorized {
-			return a.config.AuthMsg
-		}
-		return a.config.Authorized
-	}
 	return a.chooseMsg(msg.Text)
+}
+
+func (a *App) checkAuthorized(msg *Message) (bool, string) {
+	if !a.checkAuth(msg.UserID) {
+		if !a.authorize(msg) {
+			return true, a.config.AuthMsg
+		}
+		return true, a.config.Authorized
+	}
+	return false, ""
 }
 
 func (a *App) checkAuth(userID int) bool {

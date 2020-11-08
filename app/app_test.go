@@ -146,7 +146,7 @@ func TestWhenUser_NotAuthorized_ShowWelcomeAuthMessage(t *testing.T) {
 	app := SetUpReadyApp()
 
 	input := &Message{}
-	msg := app.handle(input)
+	_, msg := app.checkAuthorized(input)
 
 	assert.Equal(t, app.config.AuthMsg, msg)
 }
@@ -156,7 +156,7 @@ func TestWhenUser_NotAuthorized_SendsAuthMessage(t *testing.T) {
 	app := SetUpReadyApp()
 
 	input := &Message{Text: "Smith John abc"}
-	msg := app.handle(input)
+	_, msg := app.checkAuthorized(input)
 
 	assert.Equal(t, app.config.Authorized, msg)
 }
