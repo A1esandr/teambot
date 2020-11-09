@@ -23,8 +23,9 @@ type (
 		config *Config
 		users  map[string][]User
 
-		auth         *Auth
-		homeKeyboard tgbotapi.InlineKeyboardMarkup
+		auth          *Auth
+		homeKeyboard  tgbotapi.InlineKeyboardMarkup
+		teamsKeyboard tgbotapi.InlineKeyboardMarkup
 	}
 
 	Config struct {
@@ -52,6 +53,7 @@ type (
 	}
 
 	Message struct {
+		ChatID   int64
 		UserID   int
 		UserName string
 		Text     string
@@ -77,6 +79,11 @@ func (a *App) init() {
 			tgbotapi.NewInlineKeyboardButtonData(a.config.TeamsTitle, a.config.TeamsTitle),
 		),
 	)
+	teams := []tgbotapi.InlineKeyboardButton{}
+	for _, team := range a.config.Teams {
+		teams = append(teams, tgbotapi.NewInlineKeyboardButtonData(team.Name, team.Name))
+	}
+	a.teamsKeyboard = tgbotapi.NewInlineKeyboardMarkup(teams)
 }
 
 func (c *Config) loadConfig() error {
@@ -144,15 +151,22 @@ func (a *App) Start() {
 	updates, err := bot.GetUpdatesChan(u)
 
 	for update := range updates {
-		userMsg := &Message{
-			UserID:   update.Message.From.ID,
-			UserName: update.Message.From.UserName,
-			Text:     update.Message.Text,
+		userMsg := &Message{}
+		if update.Message != nil {
+			userMsg.UserID = update.Message.From.ID
+			userMsg.UserName = update.Message.From.UserName
+			userMsg.Text = update.Message.Text
+			userMsg.ChatID = update.Message.Chat.ID
+		}
+		if update.CallbackQuery != nil {
+			userMsg.UserID = update.CallbackQuery.From.ID
+			userMsg.UserName = update.CallbackQuery.From.UserName
+			userMsg.ChatID = update.CallbackQuery.Message.Chat.ID
 		}
 
 		guest, text := a.checkAuthorized(userMsg)
-		if guest {
-			msg := tgbotapi.NewMessage(update.Message.Chat.ID, text)
+		if guest && userMsg.ChatID > 0 {
+			msg := tgbotapi.NewMessage(userMsg.ChatID, text)
 			if text == a.config.Authorized {
 				msg.ReplyMarkup = a.homeKeyboard
 			}
@@ -165,8 +179,11 @@ func (a *App) Start() {
 
 		if update.CallbackQuery != nil {
 			fmt.Println(update)
-
-			_, err = bot.Send(tgbotapi.NewMessage(update.CallbackQuery.Message.Chat.ID, update.CallbackQuery.Data))
+			msg := tgbotapi.NewMessage(update.CallbackQuery.Message.Chat.ID, update.CallbackQuery.Data)
+			if text == a.config.TeamsTitle {
+				msg.ReplyMarkup = a.teamsKeyboard
+			}
+			_, err = bot.Send(msg)
 			if err != nil {
 				log.Println(err)
 			}
