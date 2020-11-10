@@ -151,17 +151,34 @@ func (a *App) Start() {
 	updates, err := bot.GetUpdatesChan(u)
 
 	for update := range updates {
+
+		if update.CallbackQuery != nil {
+			fmt.Println(update)
+			msg := tgbotapi.NewMessage(update.CallbackQuery.Message.Chat.ID, update.CallbackQuery.Data)
+			if update.CallbackQuery.Data == a.config.TeamsTitle {
+				msg.ReplyMarkup = a.teamsKeyboard
+			}
+			_, err = bot.Send(msg)
+			if err != nil {
+				log.Println(err)
+			}
+			_, err = bot.AnswerCallbackQuery(tgbotapi.NewCallback(update.CallbackQuery.ID, ""))
+			if err != nil {
+				log.Println(err)
+			}
+			continue
+		}
+
+		if update.Message == nil { // ignore any non-Message Updates
+			continue
+		}
+
 		userMsg := &Message{}
 		if update.Message != nil {
 			userMsg.UserID = update.Message.From.ID
 			userMsg.UserName = update.Message.From.UserName
 			userMsg.Text = update.Message.Text
 			userMsg.ChatID = update.Message.Chat.ID
-		}
-		if update.CallbackQuery != nil {
-			userMsg.UserID = update.CallbackQuery.From.ID
-			userMsg.UserName = update.CallbackQuery.From.UserName
-			userMsg.ChatID = update.CallbackQuery.Message.Chat.ID
 		}
 
 		guest, text := a.checkAuthorized(userMsg)
@@ -174,22 +191,6 @@ func (a *App) Start() {
 			if err != nil {
 				fmt.Println(err)
 			}
-			continue
-		}
-
-		if update.CallbackQuery != nil {
-			fmt.Println(update)
-			msg := tgbotapi.NewMessage(update.CallbackQuery.Message.Chat.ID, update.CallbackQuery.Data)
-			if text == a.config.TeamsTitle {
-				msg.ReplyMarkup = a.teamsKeyboard
-			}
-			_, err = bot.Send(msg)
-			if err != nil {
-				log.Println(err)
-			}
-		}
-
-		if update.Message == nil { // ignore any non-Message Updates
 			continue
 		}
 
