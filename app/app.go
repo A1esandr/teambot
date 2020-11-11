@@ -149,7 +149,32 @@ func (a *App) Start() {
 	u.Timeout = 60
 
 	updates, err := bot.GetUpdatesChan(u)
+	if err != nil {
+		fmt.Println(err)
+	}
 
+	a.Handle(bot, updates)
+}
+
+func (a *App) chooseMsg(command string) string {
+	switch command {
+	case "/start":
+		return a.config.Welcome
+	default:
+		return command
+	}
+}
+
+func (a *App) chooseKeyboard(text string) tgbotapi.InlineKeyboardMarkup {
+	switch text {
+	case a.config.Authorized:
+		return a.homeKeyboard
+	default:
+		return tgbotapi.InlineKeyboardMarkup{}
+	}
+}
+
+func (a *App) Handle(bot *tgbotapi.BotAPI, updates tgbotapi.UpdatesChannel) {
 	for update := range updates {
 
 		if update.CallbackQuery != nil {
@@ -158,7 +183,7 @@ func (a *App) Start() {
 			if update.CallbackQuery.Data == a.config.TeamsTitle {
 				msg.ReplyMarkup = a.teamsKeyboard
 			}
-			_, err = bot.Send(msg)
+			_, err := bot.Send(msg)
 			if err != nil {
 				log.Println(err)
 			}
@@ -196,7 +221,7 @@ func (a *App) Start() {
 
 		log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
 
-		text = a.handle(userMsg)
+		text = a.chooseMsg(userMsg.Text)
 		keyboard := a.chooseKeyboard(text)
 
 		msg := tgbotapi.NewMessage(update.Message.Chat.ID, text)
@@ -211,28 +236,6 @@ func (a *App) Start() {
 			fmt.Println(err)
 		}
 	}
-}
-
-func (a *App) chooseMsg(command string) string {
-	switch command {
-	case "/start":
-		return a.config.Welcome
-	default:
-		return command
-	}
-}
-
-func (a *App) chooseKeyboard(text string) tgbotapi.InlineKeyboardMarkup {
-	switch text {
-	case a.config.Authorized:
-		return a.homeKeyboard
-	default:
-		return tgbotapi.InlineKeyboardMarkup{}
-	}
-}
-
-func (a *App) handle(msg *Message) string {
-	return a.chooseMsg(msg.Text)
 }
 
 func (a *App) checkAuthorized(msg *Message) (bool, string) {
