@@ -8,6 +8,11 @@
       "members": [
         {"name": "John", "surname": "Smith"}, {"name": "Jane", "surname": "Smith"}, {"name": "Joe", "surname": "Wilson"}
       ]
+    },
+    {"name": "second",
+      "members": [
+        {"name": "Jacob", "surname": "Smithy"}, {"name": "Jil", "surname": "Jelly"}, {"name": "Sam", "surname": "Wilsoner"}
+      ]
     }
   ]
 }

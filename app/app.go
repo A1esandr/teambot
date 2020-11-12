@@ -26,6 +26,7 @@ type (
 		auth          *Auth
 		homeKeyboard  tgbotapi.InlineKeyboardMarkup
 		teamsKeyboard tgbotapi.InlineKeyboardMarkup
+		teams         map[string]Team
 	}
 
 	Config struct {
@@ -80,10 +81,13 @@ func (a *App) init() {
 		),
 	)
 	teams := []tgbotapi.InlineKeyboardButton{}
+	tmap := map[string]Team{}
 	for _, team := range a.config.Teams {
 		teams = append(teams, tgbotapi.NewInlineKeyboardButtonData(team.Name, team.Name))
+		tmap[team.Name] = team
 	}
 	a.teamsKeyboard = tgbotapi.NewInlineKeyboardMarkup(teams)
+	a.teams = tmap
 }
 
 func (c *Config) loadConfig() error {
@@ -182,6 +186,19 @@ func (a *App) Handle(bot *tgbotapi.BotAPI, updates tgbotapi.UpdatesChannel) {
 			msg := tgbotapi.NewMessage(update.CallbackQuery.Message.Chat.ID, update.CallbackQuery.Data)
 			if update.CallbackQuery.Data == a.config.TeamsTitle {
 				msg.ReplyMarkup = a.teamsKeyboard
+			}
+			if team, ok := a.teams[update.CallbackQuery.Data]; ok {
+				var sb strings.Builder
+				sb.WriteString(team.Name)
+				sb.WriteString("\n\n")
+				for _, user := range team.Users {
+					sb.WriteString(user.Surname)
+					sb.WriteString(" ")
+					sb.WriteString(user.Name)
+					sb.WriteString("\n")
+				}
+
+				msg = tgbotapi.NewMessage(update.CallbackQuery.Message.Chat.ID, sb.String())
 			}
 			_, err := bot.Send(msg)
 			if err != nil {
