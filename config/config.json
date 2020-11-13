@@ -3,6 +3,7 @@
   "auth_msg": "Hi! You are not authorized. Please send your Surname Name and auth data",
   "authorized": "Hey! I know you!",
   "teams_button_title": "Teams",
+  "sprint_button_title": "Sprint",
   "teams": [
     {"name": "first",
       "members": [
@@ -14,5 +15,8 @@
         {"name": "Jacob", "surname": "Smithy"}, {"name": "Jil", "surname": "Jelly"}, {"name": "Sam", "surname": "Wilsoner"}
       ]
     }
-  ]
+  ],
+  "sprint": {"date": "current date", "goal": "win",
+    "teams": {"first": "1", "second": "2"}
+  }
 }

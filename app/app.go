@@ -30,11 +30,13 @@ type (
 	}
 
 	Config struct {
-		Welcome    string `json:"welcome"`
-		AuthMsg    string `json:"auth_msg"`
-		Authorized string `json:"authorized"`
-		TeamsTitle string `json:"teams_button_title"`
-		Teams      []Team `json:"teams"`
+		Welcome     string `json:"welcome"`
+		AuthMsg     string `json:"auth_msg"`
+		Authorized  string `json:"authorized"`
+		TeamsTitle  string `json:"teams_button_title"`
+		SprintTitle string `json:"sprint_button_title"`
+		Teams       []Team `json:"teams"`
+		Sprint      Sprint `json:"sprint"`
 	}
 
 	Auth struct {
@@ -51,6 +53,12 @@ type (
 		Name    string `json:"name"`
 		Surname string `json:"surname"`
 		Data    string
+	}
+
+	Sprint struct {
+		Date  string            `json:"date"`
+		Goal  string            `json:"goal"`
+		Teams map[string]string `json:"teams"`
 	}
 
 	Message struct {
@@ -78,6 +86,9 @@ func (a *App) init() {
 	a.homeKeyboard = tgbotapi.NewInlineKeyboardMarkup(
 		tgbotapi.NewInlineKeyboardRow(
 			tgbotapi.NewInlineKeyboardButtonData(a.config.TeamsTitle, a.config.TeamsTitle),
+		),
+		tgbotapi.NewInlineKeyboardRow(
+			tgbotapi.NewInlineKeyboardButtonData(a.config.SprintTitle, a.config.SprintTitle),
 		),
 	)
 	teams := []tgbotapi.InlineKeyboardButton{}
@@ -187,6 +198,21 @@ func (a *App) Handle(bot *tgbotapi.BotAPI, updates tgbotapi.UpdatesChannel) {
 			if update.CallbackQuery.Data == a.config.TeamsTitle {
 				msg.ReplyMarkup = a.teamsKeyboard
 			}
+			if update.CallbackQuery.Data == a.config.SprintTitle {
+				var sb strings.Builder
+				sb.WriteString(a.config.Sprint.Date)
+				sb.WriteString("\n")
+				sb.WriteString(a.config.Sprint.Goal)
+				sb.WriteString("\n\n")
+				for team, goal := range a.config.Sprint.Teams {
+					sb.WriteString(team)
+					sb.WriteString(" - ")
+					sb.WriteString(goal)
+					sb.WriteString("\n")
+				}
+				msg = tgbotapi.NewMessage(update.CallbackQuery.Message.Chat.ID, sb.String())
+				msg.ReplyMarkup = a.homeKeyboard
+			}
 			if team, ok := a.teams[update.CallbackQuery.Data]; ok {
 				var sb strings.Builder
 				sb.WriteString(team.Name)
@@ -199,6 +225,7 @@ func (a *App) Handle(bot *tgbotapi.BotAPI, updates tgbotapi.UpdatesChannel) {
 				}
 
 				msg = tgbotapi.NewMessage(update.CallbackQuery.Message.Chat.ID, sb.String())
+				msg.ReplyMarkup = a.homeKeyboard
 			}
 			_, err := bot.Send(msg)
 			if err != nil {
