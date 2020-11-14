@@ -7,16 +7,22 @@
   "teams": [
     {"name": "first",
       "members": [
-        {"name": "John", "surname": "Smith"}, {"name": "Jane", "surname": "Smith"}, {"name": "Joe", "surname": "Wilson"}
+        {"name": "John", "surname": "Smith", "skills": "manager"},
+        {"name": "Jane", "surname": "Smith", "skills": "art"},
+        {"name": "Joe", "surname": "Wilson", "skills": "programmer"}
       ]
     },
     {"name": "second",
       "members": [
-        {"name": "Jacob", "surname": "Smithy"}, {"name": "Jil", "surname": "Jelly"}, {"name": "Sam", "surname": "Wilsoner"}
+        {"name": "Jacob", "surname": "Smithy", "skills": "manager"},
+        {"name": "Jil", "surname": "Jelly", "skills": "manager"},
+        {"name": "Sam", "surname": "Wilsoner", "skills": "manager"}
       ]
     }
   ],
-  "sprint": {"date": "current date", "goal": "win",
+  "sprints": [{"date": "current date", "goal": "win",
     "teams": {"first": "1", "second": "2"}
-  }
+  }, {"date": "past date", "goal": "win",
+    "teams": {"first": "1", "second": "2"}
+  }]
 }
