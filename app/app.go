@@ -30,13 +30,16 @@ type (
 	}
 
 	Config struct {
-		Welcome     string   `json:"welcome"`
-		AuthMsg     string   `json:"auth_msg"`
-		Authorized  string   `json:"authorized"`
-		TeamsTitle  string   `json:"teams_button_title"`
-		SprintTitle string   `json:"sprint_button_title"`
-		Teams       []Team   `json:"teams"`
-		Sprints     []Sprint `json:"sprints"`
+		Welcome          string      `json:"welcome"`
+		AuthMsg          string      `json:"auth_msg"`
+		Authorized       string      `json:"authorized"`
+		TeamsTitle       string      `json:"teams_button_title"`
+		SprintTitle      string      `json:"sprint_button_title"`
+		CommunitiesTitle string      `json:"communities_button_title"`
+		MentorsTitle     string      `json:"mentors_title"`
+		Teams            []Team      `json:"teams"`
+		Sprints          []Sprint    `json:"sprints"`
+		Communities      []Community `json:"communities"`
 	}
 
 	Auth struct {
@@ -60,6 +63,11 @@ type (
 		Date  string            `json:"date"`
 		Goal  string            `json:"goal"`
 		Teams map[string]string `json:"teams"`
+	}
+
+	Community struct {
+		Name    string `json:"name"`
+		Mentors []User `json:"mentors"`
 	}
 
 	Message struct {
@@ -90,6 +98,9 @@ func (a *App) init() {
 		),
 		tgbotapi.NewInlineKeyboardRow(
 			tgbotapi.NewInlineKeyboardButtonData(a.config.SprintTitle, a.config.SprintTitle),
+		),
+		tgbotapi.NewInlineKeyboardRow(
+			tgbotapi.NewInlineKeyboardButtonData(a.config.CommunitiesTitle, a.config.CommunitiesTitle),
 		),
 	)
 	teams := []tgbotapi.InlineKeyboardButton{}
@@ -210,6 +221,26 @@ func (a *App) Handle(bot *tgbotapi.BotAPI, updates tgbotapi.UpdatesChannel) {
 						sb.WriteString(team)
 						sb.WriteString(" - ")
 						sb.WriteString(goal)
+						sb.WriteString("\n")
+					}
+					sb.WriteString("------------")
+					sb.WriteString("\n")
+				}
+
+				msg = tgbotapi.NewMessage(update.CallbackQuery.Message.Chat.ID, sb.String())
+				msg.ReplyMarkup = a.homeKeyboard
+			}
+			if update.CallbackQuery.Data == a.config.CommunitiesTitle {
+				var sb strings.Builder
+				for _, community := range a.config.Communities {
+					sb.WriteString(community.Name)
+					sb.WriteString("\n\n")
+					sb.WriteString(a.config.MentorsTitle)
+					sb.WriteString("\n")
+					for _, mentor := range community.Mentors {
+						sb.WriteString(mentor.Surname)
+						sb.WriteString(" ")
+						sb.WriteString(mentor.Name)
 						sb.WriteString("\n")
 					}
 					sb.WriteString("------------")

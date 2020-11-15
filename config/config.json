@@ -4,6 +4,8 @@
   "authorized": "Hey! I know you!",
   "teams_button_title": "Teams",
   "sprint_button_title": "Sprint",
+  "communities_button_title": "Communities",
+  "mentors_title": "Mentors:",
   "teams": [
     {"name": "first",
       "members": [
@@ -24,5 +26,17 @@
     "teams": {"first": "1", "second": "2"}
   }, {"date": "past date", "goal": "win",
     "teams": {"first": "1", "second": "2"}
+  }],
+  "communities": [{"name": "managers",
+    "mentors": [
+      {"name": "Jacob", "surname": "Smithy", "skills": "manager"},
+      {"name": "Jil", "surname": "Jelly", "skills": "manager"},
+      {"name": "Sam", "surname": "Wilsoner", "skills": "manager"}
+    ]
+  }, {"name": "workers",
+    "mentors": [
+      {"name": "Jane", "surname": "Smith", "skills": "art"},
+      {"name": "Joe", "surname": "Wilson", "skills": "programmer"}
+    ]
   }]
 }
