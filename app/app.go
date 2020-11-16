@@ -103,26 +103,26 @@ func (a *App) init() {
 			tgbotapi.NewInlineKeyboardButtonData(a.config.CommunitiesTitle, a.config.CommunitiesTitle),
 		),
 	)
-	teams := []tgbotapi.InlineKeyboardButton{}
+	teams := [][]tgbotapi.InlineKeyboardButton{}
 	tmap := map[string]Team{}
-	for _, team := range a.config.Teams {
-		teams = append(teams, tgbotapi.NewInlineKeyboardButtonData(team.Name, team.Name))
+	for index, team := range a.config.Teams {
+		i := index / 3
+		if len(teams) == i {
+			teams = append(teams, []tgbotapi.InlineKeyboardButton{})
+		}
+		teams[i] = append(teams[i], tgbotapi.NewInlineKeyboardButtonData(team.Name, team.Name))
 		tmap[team.Name] = team
 	}
-	a.teamsKeyboard = tgbotapi.NewInlineKeyboardMarkup(teams)
+	a.teamsKeyboard = tgbotapi.InlineKeyboardMarkup{InlineKeyboard: teams}
 	a.teams = tmap
 }
 
 func (c *Config) loadConfig() error {
-	fileName := "../config/custom.json"
-	data, err := ReaderFile(fileName)
+	data, err := ReaderFile("../config/config.json")
 	if err != nil {
-		data, err = ReaderFile("../config/config.json")
+		data, err = ReaderFile("config/config.json")
 		if err != nil {
-			data, err = ReaderFile("config/config.json")
-			if err != nil {
-				return err
-			}
+			return err
 		}
 	}
 	if err := json.Unmarshal(data, c); err != nil {

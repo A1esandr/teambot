@@ -20,6 +20,20 @@
         {"name": "Jil", "surname": "Jelly", "skills": "manager"},
         {"name": "Sam", "surname": "Wilsoner", "skills": "manager"}
       ]
+    },
+    {"name": "third",
+      "members": [
+        {"name": "Fil", "surname": "Smith", "skills": "manager"},
+        {"name": "Ben", "surname": "Smith", "skills": "art"},
+        {"name": "Jin", "surname": "Wilson", "skills": "programmer"}
+      ]
+    },
+    {"name": "second",
+      "members": [
+        {"name": "Sam", "surname": "Smithy", "skills": "manager"},
+        {"name": "Dave", "surname": "Jelly", "skills": "manager"},
+        {"name": "George", "surname": "Wilsoner", "skills": "manager"}
+      ]
     }
   ],
   "sprints": [{"date": "current date", "goal": "win",
