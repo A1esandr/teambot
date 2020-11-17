@@ -19,14 +19,14 @@ var (
 
 type (
 	App struct {
-		token  string
-		config *Config
-		users  map[string][]User
-
+		token         string
+		config        *Config
+		users         map[string][]User
 		auth          *Auth
 		homeKeyboard  tgbotapi.InlineKeyboardMarkup
 		teamsKeyboard tgbotapi.InlineKeyboardMarkup
 		teams         map[string]Team
+		pages         map[string]string
 	}
 
 	Config struct {
@@ -56,6 +56,7 @@ type (
 		Name    string `json:"name"`
 		Surname string `json:"surname"`
 		Skills  string `json:"skills"`
+		Link    string `json:"link"`
 		Data    string
 	}
 
@@ -79,7 +80,11 @@ type (
 )
 
 func NewApp() *App {
-	return &App{config: &Config{}, users: map[string][]User{}, auth: &Auth{authorized: map[int]struct{}{}}}
+	return &App{
+		config: &Config{},
+		users:  map[string][]User{},
+		auth:   &Auth{authorized: map[int]struct{}{}},
+		pages:  map[string]string{}}
 }
 
 func (a *App) init() {
@@ -115,6 +120,67 @@ func (a *App) init() {
 	}
 	a.teamsKeyboard = tgbotapi.InlineKeyboardMarkup{InlineKeyboard: teams}
 	a.teams = tmap
+
+	// pages
+
+	// sprints
+	var sb strings.Builder
+	for _, sprint := range a.config.Sprints {
+		sb.WriteString(sprint.Date)
+		sb.WriteString("\n")
+		sb.WriteString(sprint.Goal)
+		sb.WriteString("\n\n")
+		for team, goal := range sprint.Teams {
+			sb.WriteString(team)
+			sb.WriteString(" - ")
+			sb.WriteString(goal)
+			sb.WriteString("\n")
+		}
+		sb.WriteString("\n")
+		sb.WriteString("------------")
+		sb.WriteString("\n\n")
+	}
+	a.pages[a.config.SprintTitle] = sb.String()
+	sb.Reset()
+
+	// communities
+	for _, community := range a.config.Communities {
+		sb.WriteString(community.Name)
+		sb.WriteString("\n\n")
+		sb.WriteString(a.config.MentorsTitle)
+		sb.WriteString("\n")
+		for _, mentor := range community.Mentors {
+			sb.WriteString(mentor.Surname)
+			sb.WriteString(" ")
+			sb.WriteString(mentor.Name)
+			sb.WriteString(" ")
+			sb.WriteString(mentor.Link)
+			sb.WriteString("\n")
+		}
+		sb.WriteString("\n")
+		sb.WriteString("------------")
+		sb.WriteString("\n\n")
+	}
+	a.pages[a.config.CommunitiesTitle] = sb.String()
+	sb.Reset()
+
+	// teams
+	for _, team := range a.config.Teams {
+		sb.WriteString(team.Name)
+		sb.WriteString("\n\n")
+		for _, user := range team.Users {
+			sb.WriteString(user.Surname)
+			sb.WriteString(" ")
+			sb.WriteString(user.Name)
+			sb.WriteString(" ")
+			sb.WriteString(user.Link)
+			sb.WriteString("\n")
+			sb.WriteString(user.Skills)
+			sb.WriteString("\n\n")
+		}
+		a.pages[team.Name] = sb.String()
+		sb.Reset()
+	}
 }
 
 func (c *Config) loadConfig() error {
@@ -211,59 +277,15 @@ func (a *App) Handle(bot *tgbotapi.BotAPI, updates tgbotapi.UpdatesChannel) {
 				msg.ReplyMarkup = a.teamsKeyboard
 			}
 			if update.CallbackQuery.Data == a.config.SprintTitle {
-				var sb strings.Builder
-				for _, sprint := range a.config.Sprints {
-					sb.WriteString(sprint.Date)
-					sb.WriteString("\n")
-					sb.WriteString(sprint.Goal)
-					sb.WriteString("\n\n")
-					for team, goal := range sprint.Teams {
-						sb.WriteString(team)
-						sb.WriteString(" - ")
-						sb.WriteString(goal)
-						sb.WriteString("\n")
-					}
-					sb.WriteString("------------")
-					sb.WriteString("\n")
-				}
-
-				msg = tgbotapi.NewMessage(update.CallbackQuery.Message.Chat.ID, sb.String())
+				msg = tgbotapi.NewMessage(update.CallbackQuery.Message.Chat.ID, a.pages[a.config.SprintTitle])
 				msg.ReplyMarkup = a.homeKeyboard
 			}
 			if update.CallbackQuery.Data == a.config.CommunitiesTitle {
-				var sb strings.Builder
-				for _, community := range a.config.Communities {
-					sb.WriteString(community.Name)
-					sb.WriteString("\n\n")
-					sb.WriteString(a.config.MentorsTitle)
-					sb.WriteString("\n")
-					for _, mentor := range community.Mentors {
-						sb.WriteString(mentor.Surname)
-						sb.WriteString(" ")
-						sb.WriteString(mentor.Name)
-						sb.WriteString("\n")
-					}
-					sb.WriteString("------------")
-					sb.WriteString("\n")
-				}
-
-				msg = tgbotapi.NewMessage(update.CallbackQuery.Message.Chat.ID, sb.String())
+				msg = tgbotapi.NewMessage(update.CallbackQuery.Message.Chat.ID, a.pages[a.config.CommunitiesTitle])
 				msg.ReplyMarkup = a.homeKeyboard
 			}
 			if team, ok := a.teams[update.CallbackQuery.Data]; ok {
-				var sb strings.Builder
-				sb.WriteString(team.Name)
-				sb.WriteString("\n\n")
-				for _, user := range team.Users {
-					sb.WriteString(user.Surname)
-					sb.WriteString(" ")
-					sb.WriteString(user.Name)
-					sb.WriteString(" - ")
-					sb.WriteString(user.Skills)
-					sb.WriteString("\n")
-				}
-
-				msg = tgbotapi.NewMessage(update.CallbackQuery.Message.Chat.ID, sb.String())
+				msg = tgbotapi.NewMessage(update.CallbackQuery.Message.Chat.ID, a.pages[team.Name])
 				msg.ReplyMarkup = a.homeKeyboard
 			}
 			_, err := bot.Send(msg)

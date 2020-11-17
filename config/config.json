@@ -9,7 +9,7 @@
   "teams": [
     {"name": "first",
       "members": [
-        {"name": "John", "surname": "Smith", "skills": "manager"},
+        {"name": "John", "surname": "Smith", "skills": "manager", "link": "example.com"},
         {"name": "Jane", "surname": "Smith", "skills": "art"},
         {"name": "Joe", "surname": "Wilson", "skills": "programmer"}
       ]
@@ -28,7 +28,7 @@
         {"name": "Jin", "surname": "Wilson", "skills": "programmer"}
       ]
     },
-    {"name": "second",
+    {"name": "fourth",
       "members": [
         {"name": "Sam", "surname": "Smithy", "skills": "manager"},
         {"name": "Dave", "surname": "Jelly", "skills": "manager"},
@@ -43,14 +43,14 @@
   }],
   "communities": [{"name": "managers",
     "mentors": [
-      {"name": "Jacob", "surname": "Smithy", "skills": "manager"},
-      {"name": "Jil", "surname": "Jelly", "skills": "manager"},
-      {"name": "Sam", "surname": "Wilsoner", "skills": "manager"}
+      {"name": "Jacob", "surname": "Smithy", "skills": "manager", "link": "example.com"},
+      {"name": "Jil", "surname": "Jelly", "skills": "manager", "link": "example.com"},
+      {"name": "Sam", "surname": "Wilsoner", "skills": "manager", "link": "example.com"}
     ]
   }, {"name": "workers",
     "mentors": [
-      {"name": "Jane", "surname": "Smith", "skills": "art"},
-      {"name": "Joe", "surname": "Wilson", "skills": "programmer"}
+      {"name": "Jane", "surname": "Smith", "skills": "art", "link": "example.com"},
+      {"name": "Joe", "surname": "Wilson", "skills": "programmer", "link": "example.com"}
     ]
   }]
 }
