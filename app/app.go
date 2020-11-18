@@ -19,14 +19,15 @@ var (
 
 type (
 	App struct {
-		token         string
-		config        *Config
-		users         map[string][]User
-		auth          *Auth
-		homeKeyboard  tgbotapi.InlineKeyboardMarkup
-		teamsKeyboard tgbotapi.InlineKeyboardMarkup
-		teams         map[string]Team
-		pages         map[string]string
+		token               string
+		config              *Config
+		users               map[string][]User
+		auth                *Auth
+		homeKeyboard        tgbotapi.InlineKeyboardMarkup
+		teamsKeyboard       tgbotapi.InlineKeyboardMarkup
+		communitiesKeyboard tgbotapi.InlineKeyboardMarkup
+		teams               map[string]Team
+		pages               map[string]string
 	}
 
 	Config struct {
@@ -108,18 +109,27 @@ func (a *App) init() {
 			tgbotapi.NewInlineKeyboardButtonData(a.config.CommunitiesTitle, a.config.CommunitiesTitle),
 		),
 	)
+	// teams
 	teams := [][]tgbotapi.InlineKeyboardButton{}
-	tmap := map[string]Team{}
 	for index, team := range a.config.Teams {
 		i := index / 3
 		if len(teams) == i {
 			teams = append(teams, []tgbotapi.InlineKeyboardButton{})
 		}
 		teams[i] = append(teams[i], tgbotapi.NewInlineKeyboardButtonData(team.Name, team.Name))
-		tmap[team.Name] = team
 	}
 	a.teamsKeyboard = tgbotapi.InlineKeyboardMarkup{InlineKeyboard: teams}
-	a.teams = tmap
+
+	// communities
+	communities := [][]tgbotapi.InlineKeyboardButton{}
+	for index, community := range a.config.Communities {
+		i := index / 2
+		if len(communities) == i {
+			communities = append(communities, []tgbotapi.InlineKeyboardButton{})
+		}
+		communities[i] = append(communities[i], tgbotapi.NewInlineKeyboardButtonData(community.Name, community.Name))
+	}
+	a.communitiesKeyboard = tgbotapi.InlineKeyboardMarkup{InlineKeyboard: communities}
 
 	// pages
 
@@ -158,11 +168,9 @@ func (a *App) init() {
 			sb.WriteString("\n")
 		}
 		sb.WriteString("\n")
-		sb.WriteString("------------")
-		sb.WriteString("\n\n")
+		a.pages[community.Name] = sb.String()
+		sb.Reset()
 	}
-	a.pages[a.config.CommunitiesTitle] = sb.String()
-	sb.Reset()
 
 	// teams
 	for _, team := range a.config.Teams {
@@ -271,7 +279,6 @@ func (a *App) Handle(bot *tgbotapi.BotAPI, updates tgbotapi.UpdatesChannel) {
 	for update := range updates {
 
 		if update.CallbackQuery != nil {
-			fmt.Println(update)
 			msg := tgbotapi.NewMessage(update.CallbackQuery.Message.Chat.ID, update.CallbackQuery.Data)
 			if update.CallbackQuery.Data == a.config.TeamsTitle {
 				msg.ReplyMarkup = a.teamsKeyboard
@@ -281,11 +288,10 @@ func (a *App) Handle(bot *tgbotapi.BotAPI, updates tgbotapi.UpdatesChannel) {
 				msg.ReplyMarkup = a.homeKeyboard
 			}
 			if update.CallbackQuery.Data == a.config.CommunitiesTitle {
-				msg = tgbotapi.NewMessage(update.CallbackQuery.Message.Chat.ID, a.pages[a.config.CommunitiesTitle])
-				msg.ReplyMarkup = a.homeKeyboard
+				msg.ReplyMarkup = a.communitiesKeyboard
 			}
-			if team, ok := a.teams[update.CallbackQuery.Data]; ok {
-				msg = tgbotapi.NewMessage(update.CallbackQuery.Message.Chat.ID, a.pages[team.Name])
+			if page, ok := a.pages[update.CallbackQuery.Data]; ok {
+				msg = tgbotapi.NewMessage(update.CallbackQuery.Message.Chat.ID, page)
 				msg.ReplyMarkup = a.homeKeyboard
 			}
 			_, err := bot.Send(msg)
