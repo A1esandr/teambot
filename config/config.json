@@ -38,11 +38,25 @@
       ]
     }
   ],
-  "sprints": [{"date": "current date", "goal": "win",
+  "sprints": [
+    {"date": "current date", "goal": "win",
     "teams": {"first": "1", "second": "2"}
-  }, {"date": "past date", "goal": "win",
+    },
+    {"date": "past date", "goal": "win",
     "teams": {"first": "1", "second": "2"}
-  }],
+    }
+  ],
+  "events": [
+    {"title": "Planning", "info": "",
+      "items": [{"title": "Planning 1", "date": "01 Jan 1970", "info": "First planning", "links": [{"title": "site", "value": "example.com"}]}]
+    },
+    {"title": "Refinement", "info": "",
+      "items": [{"title": "Refinement 1", "date": "01 Jan 1970", "info": "First refinement", "links": [{"title": "site", "value": "example.com"}]}]
+    },
+    {"title": "Retro", "info": "",
+      "items": [{"title": "Retro 1", "date": "01 Jan 1970", "info": "First retro", "links": [{"title": "site", "value": "example.com"}]}]
+    }
+  ],
   "communities": [{"name": "managers",
     "mentors": [
       {"name": "Jacob", "surname": "Smithy", "skills": "manager", "link": "example.com"},
