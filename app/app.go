@@ -37,6 +37,8 @@ type (
 		TeamsTitle       string      `json:"teams_button_title"`
 		SprintTitle      string      `json:"sprint_button_title"`
 		CommunitiesTitle string      `json:"communities_button_title"`
+		EventsTitle      string      `json:"events_button_title"`
+		EventsInfo       string      `json:"events_info"`
 		MentorsTitle     string      `json:"mentors_title"`
 		Teams            []Team      `json:"teams"`
 		Sprints          []Sprint    `json:"sprints"`
@@ -100,12 +102,11 @@ func (a *App) init() {
 	a.loadUsers()
 	a.homeKeyboard = tgbotapi.NewInlineKeyboardMarkup(
 		tgbotapi.NewInlineKeyboardRow(
-			tgbotapi.NewInlineKeyboardButtonData(a.config.TeamsTitle, a.config.TeamsTitle),
-		),
-		tgbotapi.NewInlineKeyboardRow(
 			tgbotapi.NewInlineKeyboardButtonData(a.config.SprintTitle, a.config.SprintTitle),
+			tgbotapi.NewInlineKeyboardButtonData(a.config.EventsTitle, a.config.EventsTitle),
 		),
 		tgbotapi.NewInlineKeyboardRow(
+			tgbotapi.NewInlineKeyboardButtonData(a.config.TeamsTitle, a.config.TeamsTitle),
 			tgbotapi.NewInlineKeyboardButtonData(a.config.CommunitiesTitle, a.config.CommunitiesTitle),
 		),
 	)
@@ -133,8 +134,17 @@ func (a *App) init() {
 
 	// pages
 
-	// sprints
+	// events
 	var sb strings.Builder
+	sb.WriteString(a.config.EventsTitle)
+	sb.WriteString("\n\n")
+	sb.WriteString(a.config.EventsInfo)
+	sb.WriteString("\n")
+	a.pages[a.config.EventsTitle] = sb.String()
+	sb.Reset()
+
+	// sprints
+
 	for _, sprint := range a.config.Sprints {
 		sb.WriteString(sprint.Date)
 		sb.WriteString("\n")
@@ -285,6 +295,9 @@ func (a *App) Handle(bot *tgbotapi.BotAPI, updates tgbotapi.UpdatesChannel) {
 			}
 			if update.CallbackQuery.Data == a.config.SprintTitle {
 				msg = tgbotapi.NewMessage(update.CallbackQuery.Message.Chat.ID, a.pages[a.config.SprintTitle])
+				msg.ReplyMarkup = a.homeKeyboard
+			}
+			if update.CallbackQuery.Data == a.config.EventsTitle {
 				msg.ReplyMarkup = a.homeKeyboard
 			}
 			if update.CallbackQuery.Data == a.config.CommunitiesTitle {

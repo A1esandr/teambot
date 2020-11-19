@@ -5,6 +5,8 @@
   "teams_button_title": "Teams",
   "sprint_button_title": "Sprint",
   "communities_button_title": "Communities",
+  "events_button_title": "Events",
+  "events_info": "Events info",
   "mentors_title": "Mentors:",
   "teams": [
     {"name": "first",
