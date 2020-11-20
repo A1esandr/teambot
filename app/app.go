@@ -19,17 +19,14 @@ var (
 
 type (
 	App struct {
-		token               string
-		config              *Config
-		users               map[string][]User
-		auth                *Auth
-		homeKeyboard        tgbotapi.InlineKeyboardMarkup
-		teamsKeyboard       tgbotapi.InlineKeyboardMarkup
-		communitiesKeyboard tgbotapi.InlineKeyboardMarkup
-		eventsKeyboard      tgbotapi.InlineKeyboardMarkup
-		eventKeyboards      map[string]tgbotapi.InlineKeyboardMarkup
-		teams               map[string]Team
-		pages               map[string]string
+		token        string
+		config       *Config
+		users        map[string][]User
+		auth         *Auth
+		homeKeyboard tgbotapi.InlineKeyboardMarkup
+		keyboards    map[string]tgbotapi.InlineKeyboardMarkup
+		teams        map[string]Team
+		pages        map[string]string
 	}
 
 	Config struct {
@@ -77,18 +74,18 @@ type (
 		Title string `json:"title"`
 		Info  string `json:"info"`
 		Date  string `json:"date"`
-		Links []Link `json:"links"`
+		Links []Item `json:"links"`
 	}
 
-	Link struct {
+	Item struct {
 		Title string `json:"title"`
 		Value string `json:"value"`
 	}
 
 	Sprint struct {
-		Date  string            `json:"date"`
-		Goal  string            `json:"goal"`
-		Teams map[string]string `json:"teams"`
+		Date  string `json:"date"`
+		Goal  string `json:"goal"`
+		Teams []Item `json:"teams"`
 	}
 
 	Community struct {
@@ -106,11 +103,11 @@ type (
 
 func NewApp() *App {
 	return &App{
-		config:         &Config{},
-		users:          map[string][]User{},
-		auth:           &Auth{authorized: map[int]struct{}{}},
-		eventKeyboards: map[string]tgbotapi.InlineKeyboardMarkup{},
-		pages:          map[string]string{}}
+		config:    &Config{},
+		users:     map[string][]User{},
+		auth:      &Auth{authorized: map[int]struct{}{}},
+		keyboards: map[string]tgbotapi.InlineKeyboardMarkup{},
+		pages:     map[string]string{}}
 }
 
 func (a *App) init() {
@@ -142,7 +139,7 @@ func (a *App) init() {
 		}
 		teams[i] = append(teams[i], tgbotapi.NewInlineKeyboardButtonData(team.Name, team.Name))
 	}
-	a.teamsKeyboard = tgbotapi.InlineKeyboardMarkup{InlineKeyboard: teams}
+	a.keyboards[a.config.TeamsTitle] = tgbotapi.InlineKeyboardMarkup{InlineKeyboard: teams}
 
 	// communities
 	communities := [][]tgbotapi.InlineKeyboardButton{}
@@ -153,7 +150,18 @@ func (a *App) init() {
 		}
 		communities[i] = append(communities[i], tgbotapi.NewInlineKeyboardButtonData(community.Name, community.Name))
 	}
-	a.communitiesKeyboard = tgbotapi.InlineKeyboardMarkup{InlineKeyboard: communities}
+	a.keyboards[a.config.CommunitiesTitle] = tgbotapi.InlineKeyboardMarkup{InlineKeyboard: communities}
+
+	// sprints
+	sprints := [][]tgbotapi.InlineKeyboardButton{}
+	for index, sprint := range a.config.Sprints {
+		i := index / 2
+		if len(sprints) == i {
+			sprints = append(sprints, []tgbotapi.InlineKeyboardButton{})
+		}
+		sprints[i] = append(sprints[i], tgbotapi.NewInlineKeyboardButtonData(sprint.Date, sprint.Date))
+	}
+	a.keyboards[a.config.SprintTitle] = tgbotapi.InlineKeyboardMarkup{InlineKeyboard: sprints}
 
 	// events
 	events := [][]tgbotapi.InlineKeyboardButton{}
@@ -173,9 +181,9 @@ func (a *App) init() {
 			eventKey := innerEvent.Title + " " + innerEvent.Date
 			innerEvents[x] = append(innerEvents[x], tgbotapi.NewInlineKeyboardButtonData(eventKey, eventKey))
 		}
-		a.eventKeyboards[event.Title] = tgbotapi.InlineKeyboardMarkup{InlineKeyboard: innerEvents}
+		a.keyboards[event.Title] = tgbotapi.InlineKeyboardMarkup{InlineKeyboard: innerEvents}
 	}
-	a.eventsKeyboard = tgbotapi.InlineKeyboardMarkup{InlineKeyboard: events}
+	a.keyboards[a.config.EventsTitle] = tgbotapi.InlineKeyboardMarkup{InlineKeyboard: events}
 
 	// pages
 
@@ -195,18 +203,16 @@ func (a *App) init() {
 		sb.WriteString("\n")
 		sb.WriteString(sprint.Goal)
 		sb.WriteString("\n\n")
-		for team, goal := range sprint.Teams {
-			sb.WriteString(team)
+		for _, team := range sprint.Teams {
+			sb.WriteString(team.Title)
 			sb.WriteString(" - ")
-			sb.WriteString(goal)
+			sb.WriteString(team.Value)
 			sb.WriteString("\n")
 		}
 		sb.WriteString("\n")
-		sb.WriteString("------------")
-		sb.WriteString("\n\n")
+		a.pages[sprint.Date] = sb.String()
+		sb.Reset()
 	}
-	a.pages[a.config.SprintTitle] = sb.String()
-	sb.Reset()
 
 	// communities
 	for _, community := range a.config.Communities {
@@ -361,21 +367,8 @@ func (a *App) Handle(bot *tgbotapi.BotAPI, updates tgbotapi.UpdatesChannel) {
 				msg = tgbotapi.NewMessage(update.CallbackQuery.Message.Chat.ID, page)
 				msg.ReplyMarkup = a.homeKeyboard
 			}
-			if keyboard, ok := a.eventKeyboards[update.CallbackQuery.Data]; ok {
+			if keyboard, ok := a.keyboards[update.CallbackQuery.Data]; ok {
 				msg.ReplyMarkup = keyboard
-			}
-			if update.CallbackQuery.Data == a.config.TeamsTitle {
-				msg.ReplyMarkup = a.teamsKeyboard
-			}
-			if update.CallbackQuery.Data == a.config.SprintTitle {
-				msg = tgbotapi.NewMessage(update.CallbackQuery.Message.Chat.ID, a.pages[a.config.SprintTitle])
-				msg.ReplyMarkup = a.homeKeyboard
-			}
-			if update.CallbackQuery.Data == a.config.EventsTitle {
-				msg.ReplyMarkup = a.eventsKeyboard
-			}
-			if update.CallbackQuery.Data == a.config.CommunitiesTitle {
-				msg.ReplyMarkup = a.communitiesKeyboard
 			}
 			_, err := bot.Send(msg)
 			if err != nil {

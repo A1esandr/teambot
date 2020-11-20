@@ -40,10 +40,10 @@
   ],
   "sprints": [
     {"date": "current date", "goal": "win",
-    "teams": {"first": "1", "second": "2"}
+    "teams": [{"title": "first", "value": "1"}, {"title": "second", "value": "2"}]
     },
     {"date": "past date", "goal": "win",
-    "teams": {"first": "1", "second": "2"}
+    "teams": [{"title": "first", "value": "1"}, {"title": "second", "value": "2"}]
     }
   ],
   "events": [
