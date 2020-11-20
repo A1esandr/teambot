@@ -55,6 +55,9 @@
     },
     {"title": "Retro", "info": "",
       "items": [{"title": "Retro 1", "date": "01 Jan 1970", "info": "First retro", "links": [{"title": "site", "value": "example.com"}]}]
+    },
+    {"title": "Review", "info": "",
+      "items": [{"title": "Review 1", "date": "01 Jan 1970", "info": "First Review", "links": [{"title": "site", "value": "example.com"}]}]
     }
   ],
   "communities": [{"name": "managers",

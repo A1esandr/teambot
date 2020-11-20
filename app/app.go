@@ -158,7 +158,7 @@ func (a *App) init() {
 	// events
 	events := [][]tgbotapi.InlineKeyboardButton{}
 	for index, event := range a.config.Events {
-		i := index / 3
+		i := index / 2
 		if len(events) == i {
 			events = append(events, []tgbotapi.InlineKeyboardButton{})
 		}
