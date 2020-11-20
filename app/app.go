@@ -55,6 +55,7 @@ type (
 
 	Team struct {
 		Name  string `json:"name"`
+		Info  string `json:"info"`
 		Users []User `json:"members"`
 	}
 
@@ -229,6 +230,8 @@ func (a *App) init() {
 	// teams
 	for _, team := range a.config.Teams {
 		sb.WriteString(team.Name)
+		sb.WriteString("\n\n")
+		sb.WriteString(team.Info)
 		sb.WriteString("\n\n")
 		for _, user := range team.Users {
 			sb.WriteString(user.Surname)

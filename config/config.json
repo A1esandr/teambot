@@ -9,21 +9,21 @@
   "events_info": "Events info",
   "mentors_title": "Mentors:",
   "teams": [
-    {"name": "first",
+    {"name": "first", "info": "desc",
       "members": [
         {"name": "John", "surname": "Smith", "skills": "manager", "link": "example.com"},
         {"name": "Jane", "surname": "Smith", "skills": "art"},
         {"name": "Joe", "surname": "Wilson", "skills": "programmer"}
       ]
     },
-    {"name": "second",
+    {"name": "second", "info": "desc",
       "members": [
         {"name": "Jacob", "surname": "Smithy", "skills": "manager"},
         {"name": "Jil", "surname": "Jelly", "skills": "manager"},
         {"name": "Sam", "surname": "Wilsoner", "skills": "manager"}
       ]
     },
-    {"name": "third",
+    {"name": "third", "info": "desc",
       "members": [
         {"name": "Fil", "surname": "Smith", "skills": "manager"},
         {"name": "Ben", "surname": "Smith", "skills": "art"},
