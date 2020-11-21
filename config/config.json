@@ -7,7 +7,6 @@
   "communities_button_title": "Communities",
   "events_button_title": "Events",
   "events_info": "Events info",
-  "mentors_title": "Mentors:",
   "teams": [
     {"name": "first", "info": "desc",
       "members": [
@@ -60,13 +59,13 @@
       "items": [{"title": "Review 1", "date": "01 Jan 1970", "info": "First Review", "links": [{"title": "site", "value": "example.com"}]}]
     }
   ],
-  "communities": [{"name": "managers",
+  "communities": [{"name": "managers", "rows": [{"title": "Mentors:", "value": ""}],
     "mentors": [
       {"name": "Jacob", "surname": "Smithy", "skills": "manager", "link": "example.com"},
       {"name": "Jil", "surname": "Jelly", "skills": "manager", "link": "example.com"},
       {"name": "Sam", "surname": "Wilsoner", "skills": "manager", "link": "example.com"}
     ]
-  }, {"name": "workers",
+  }, {"name": "workers", "rows": [{"title": "Mentors:", "value": ""}],
     "mentors": [
       {"name": "Jane", "surname": "Smith", "skills": "art", "link": "example.com"},
       {"name": "Joe", "surname": "Wilson", "skills": "programmer", "link": "example.com"}

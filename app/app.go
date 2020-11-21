@@ -38,7 +38,6 @@ type (
 		CommunitiesTitle string        `json:"communities_button_title"`
 		EventsTitle      string        `json:"events_button_title"`
 		EventsInfo       string        `json:"events_info"`
-		MentorsTitle     string        `json:"mentors_title"`
 		Teams            []Team        `json:"teams"`
 		Sprints          []Sprint      `json:"sprints"`
 		Communities      []Community   `json:"communities"`
@@ -91,6 +90,7 @@ type (
 	Community struct {
 		Name    string `json:"name"`
 		Mentors []User `json:"mentors"`
+		Rows    []Item `json:"rows"`
 	}
 
 	Message struct {
@@ -218,8 +218,12 @@ func (a *App) init() {
 	for _, community := range a.config.Communities {
 		sb.WriteString(community.Name)
 		sb.WriteString("\n\n")
-		sb.WriteString(a.config.MentorsTitle)
-		sb.WriteString("\n")
+		for _, row := range community.Rows {
+			sb.WriteString(row.Title)
+			sb.WriteString(" ")
+			sb.WriteString(row.Value)
+			sb.WriteString("\n")
+		}
 		for _, mentor := range community.Mentors {
 			sb.WriteString(mentor.Surname)
 			sb.WriteString(" ")
