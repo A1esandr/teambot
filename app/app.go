@@ -65,7 +65,7 @@ type (
 
 	EventsGroup struct {
 		Title  string  `json:"title"`
-		Info   string  `json:"info"`
+		Rows   []Item  `json:"rows"`
 		Events []Event `json:"items"`
 	}
 
@@ -82,9 +82,9 @@ type (
 	}
 
 	Sprint struct {
-		Date  string `json:"date"`
-		Goal  string `json:"goal"`
-		Teams []Item `json:"teams"`
+		Date string `json:"date"`
+		Goal string `json:"goal"`
+		Rows []Item `json:"rows"`
 	}
 
 	Community struct {
@@ -203,10 +203,10 @@ func (a *App) init() {
 		sb.WriteString("\n")
 		sb.WriteString(sprint.Goal)
 		sb.WriteString("\n\n")
-		for _, team := range sprint.Teams {
-			sb.WriteString(team.Title)
+		for _, row := range sprint.Rows {
+			sb.WriteString(row.Title)
 			sb.WriteString(" - ")
-			sb.WriteString(team.Value)
+			sb.WriteString(row.Value)
 			sb.WriteString("\n")
 		}
 		sb.WriteString("\n")
@@ -259,6 +259,16 @@ func (a *App) init() {
 
 	// events
 	for _, group := range a.config.Events {
+		sb.WriteString(group.Title)
+		sb.WriteString("\n")
+		for _, row := range group.Rows {
+			sb.WriteString(row.Title)
+			sb.WriteString(" ")
+			sb.WriteString(row.Value)
+			sb.WriteString("\n")
+		}
+		a.pages[group.Title] = sb.String()
+		sb.Reset()
 		for _, event := range group.Events {
 			sb.WriteString(event.Title)
 			sb.WriteString(" ")

@@ -39,23 +39,23 @@
   ],
   "sprints": [
     {"date": "current date", "goal": "win",
-    "teams": [{"title": "first", "value": "1"}, {"title": "second", "value": "2"}]
+    "rows": [{"title": "first", "value": "1"}, {"title": "second", "value": "2"}]
     },
     {"date": "past date", "goal": "win",
-    "teams": [{"title": "first", "value": "1"}, {"title": "second", "value": "2"}]
+    "rows": [{"title": "first", "value": "1"}, {"title": "second", "value": "2"}]
     }
   ],
   "events": [
-    {"title": "Planning", "info": "",
+    {"title": "Planning", "rows": [{"title": "Link:", "value": "example.com"}],
       "items": [{"title": "Planning 1", "date": "01 Jan 1970", "info": "First planning", "links": [{"title": "site", "value": "example.com"}]}]
     },
-    {"title": "Refinement", "info": "",
+    {"title": "Refinement", "rows": [{"title": "Link:", "value": "example.com"}],
       "items": [{"title": "Refinement 1", "date": "01 Jan 1970", "info": "First refinement", "links": [{"title": "site", "value": "example.com"}]}]
     },
-    {"title": "Retro", "info": "",
+    {"title": "Retro", "rows": [{"title": "Link:", "value": "example.com"}],
       "items": [{"title": "Retro 1", "date": "01 Jan 1970", "info": "First retro", "links": [{"title": "site", "value": "example.com"}]}]
     },
-    {"title": "Review", "info": "",
+    {"title": "Review", "rows": [{"title": "Link:", "value": "example.com"}],
       "items": [{"title": "Review 1", "date": "01 Jan 1970", "info": "First Review", "links": [{"title": "site", "value": "example.com"}]}]
     }
   ],
