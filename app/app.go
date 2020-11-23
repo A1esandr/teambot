@@ -50,9 +50,9 @@ type (
 	}
 
 	Team struct {
-		Name  string `json:"name"`
-		Info  string `json:"info"`
-		Users []User `json:"members"`
+		Name  string   `json:"name"`
+		Rows  []string `json:"rows"`
+		Users []User   `json:"members"`
 	}
 
 	User struct {
@@ -60,6 +60,7 @@ type (
 		Surname string `json:"surname"`
 		Skills  string `json:"skills"`
 		Link    string `json:"link"`
+		Phone   string `json:"phone"`
 		Data    string
 	}
 
@@ -230,6 +231,8 @@ func (a *App) init() {
 			sb.WriteString(mentor.Name)
 			sb.WriteString(" ")
 			sb.WriteString(mentor.Link)
+			sb.WriteString(" ")
+			sb.WriteString(mentor.Phone)
 			sb.WriteString("\n")
 		}
 		sb.WriteString("\n")
@@ -241,8 +244,10 @@ func (a *App) init() {
 	for _, team := range a.config.Teams {
 		sb.WriteString(team.Name)
 		sb.WriteString("\n\n")
-		sb.WriteString(team.Info)
-		sb.WriteString("\n\n")
+		for _, row := range team.Rows {
+			sb.WriteString(row)
+			sb.WriteString("\n")
+		}
 		for _, user := range team.Users {
 			sb.WriteString(user.Surname)
 			sb.WriteString(" ")
@@ -251,6 +256,8 @@ func (a *App) init() {
 			sb.WriteString(user.Link)
 			sb.WriteString("\n")
 			sb.WriteString(user.Skills)
+			sb.WriteString(" ")
+			sb.WriteString(user.Phone)
 			sb.WriteString("\n\n")
 		}
 		a.pages[team.Name] = sb.String()

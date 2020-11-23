@@ -8,21 +8,21 @@
   "events_button_title": "Events",
   "events_info": "Events info",
   "teams": [
-    {"name": "first", "info": "desc",
+    {"name": "first", "rows": ["Link: example.com \n\n"],
       "members": [
         {"name": "John", "surname": "Smith", "skills": "manager", "link": "example.com"},
-        {"name": "Jane", "surname": "Smith", "skills": "art"},
+        {"name": "Jane", "surname": "Smith", "skills": "art", "phone": "89991112233"},
         {"name": "Joe", "surname": "Wilson", "skills": "programmer"}
       ]
     },
-    {"name": "second", "info": "desc",
+    {"name": "second", "rows": ["Link: example.com \n\n"],
       "members": [
         {"name": "Jacob", "surname": "Smithy", "skills": "manager"},
         {"name": "Jil", "surname": "Jelly", "skills": "manager"},
         {"name": "Sam", "surname": "Wilsoner", "skills": "manager"}
       ]
     },
-    {"name": "third", "info": "desc",
+    {"name": "third", "rows": [],
       "members": [
         {"name": "Fil", "surname": "Smith", "skills": "manager"},
         {"name": "Ben", "surname": "Smith", "skills": "art"},
