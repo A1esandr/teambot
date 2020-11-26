@@ -7,6 +7,7 @@
   "communities_button_title": "Communities",
   "events_button_title": "Events",
   "events_info": "Events info",
+  "artifacts_button_title": "Artifacts",
   "teams": [
     {"name": "first", "rows": ["Link: example.com \n\n"],
       "members": [
@@ -70,5 +71,10 @@
       {"name": "Jane", "surname": "Smith", "skills": "art", "link": "example.com"},
       {"name": "Joe", "surname": "Wilson", "skills": "programmer", "link": "example.com"}
     ]
+  }],
+  "artifacts": [{"title": "Links",
+    "rows": ["Row"]
+  }, {"title": "Sites",
+    "rows": ["Site: example.com"]
   }]
 }

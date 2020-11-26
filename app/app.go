@@ -37,11 +37,13 @@ type (
 		SprintTitle      string        `json:"sprint_button_title"`
 		CommunitiesTitle string        `json:"communities_button_title"`
 		EventsTitle      string        `json:"events_button_title"`
+		ArtifactsTitle   string        `json:"artifacts_button_title"`
 		EventsInfo       string        `json:"events_info"`
 		Teams            []Team        `json:"teams"`
 		Sprints          []Sprint      `json:"sprints"`
 		Communities      []Community   `json:"communities"`
 		Events           []EventsGroup `json:"events"`
+		Artifacts        []Record      `json:"artifacts"`
 	}
 
 	Auth struct {
@@ -75,6 +77,11 @@ type (
 		Info  string `json:"info"`
 		Date  string `json:"date"`
 		Links []Item `json:"links"`
+	}
+
+	Record struct {
+		Title string   `json:"title"`
+		Rows  []string `json:"rows"`
 	}
 
 	Item struct {
@@ -129,6 +136,9 @@ func (a *App) init() {
 		tgbotapi.NewInlineKeyboardRow(
 			tgbotapi.NewInlineKeyboardButtonData(a.config.TeamsTitle, a.config.TeamsTitle),
 			tgbotapi.NewInlineKeyboardButtonData(a.config.CommunitiesTitle, a.config.CommunitiesTitle),
+		),
+		tgbotapi.NewInlineKeyboardRow(
+			tgbotapi.NewInlineKeyboardButtonData(a.config.ArtifactsTitle, a.config.ArtifactsTitle),
 		),
 	)
 	// teams
@@ -185,6 +195,17 @@ func (a *App) init() {
 		a.keyboards[event.Title] = tgbotapi.InlineKeyboardMarkup{InlineKeyboard: innerEvents}
 	}
 	a.keyboards[a.config.EventsTitle] = tgbotapi.InlineKeyboardMarkup{InlineKeyboard: events}
+
+	// artifacts
+	artifacts := [][]tgbotapi.InlineKeyboardButton{}
+	for index, fact := range a.config.Artifacts {
+		i := index / 2
+		if len(artifacts) == i {
+			artifacts = append(artifacts, []tgbotapi.InlineKeyboardButton{})
+		}
+		artifacts[i] = append(artifacts[i], tgbotapi.NewInlineKeyboardButtonData(fact.Title, fact.Title))
+	}
+	a.keyboards[a.config.ArtifactsTitle] = tgbotapi.InlineKeyboardMarkup{InlineKeyboard: artifacts}
 
 	// pages
 
@@ -292,6 +313,18 @@ func (a *App) init() {
 			a.pages[event.Title+" "+event.Date] = sb.String()
 			sb.Reset()
 		}
+	}
+
+	// artifacts
+	for _, artifact := range a.config.Artifacts {
+		sb.WriteString(artifact.Title)
+		sb.WriteString("\n")
+		for _, row := range artifact.Rows {
+			sb.WriteString(row)
+			sb.WriteString("\n")
+		}
+		a.pages[artifact.Title] = sb.String()
+		sb.Reset()
 	}
 }
 
