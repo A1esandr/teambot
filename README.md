@@ -1,4 +1,4 @@
-# teambot
+# Teambot
 Telegram bot for teams
 
 ### Used
