@@ -16,4 +16,5 @@ func TestWhenLoadConfigFile(t *testing.T) {
 	assert.Equal(t, "Artifacts", config.ArtifactsTitle)
 	assert.True(t, len(config.Teams) > 0)
 	assert.True(t, len(config.Events) > 0)
+	assert.True(t, len(config.Communities) > 0)
 }
