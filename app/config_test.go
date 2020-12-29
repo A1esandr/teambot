@@ -18,4 +18,5 @@ func TestWhenLoadConfigFile(t *testing.T) {
 	assert.True(t, len(config.Events) > 0)
 	assert.True(t, len(config.Communities) > 0)
 	assert.True(t, len(config.Artifacts) > 0)
+	assert.True(t, len(config.Sprints) > 0)
 }
